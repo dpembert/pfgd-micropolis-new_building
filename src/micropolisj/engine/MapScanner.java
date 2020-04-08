@@ -42,7 +42,7 @@ class MapScanner extends TileBehavior
 		STADIUM_FULL,
 		AIRPORT,
 		SEAPORT,
-		NEW_BUILDING; //Placeholder enum for new building. Change to building name if making a new building
+		CAPTAIN; //new name = CAPTAIN
 	}
 
 	@Override
@@ -85,8 +85,8 @@ class MapScanner extends TileBehavior
 		case SEAPORT:
 			doSeaport();
 			return;
-		case NEW_BUILDING:
-			doNewBuilding(); //Call the NEW_BUILDING placeholder function
+		case CAPTAIN:
+			doCaptain(); //Call the Captain Planet function
 			return;
 		default:
 			assert false;
@@ -210,13 +210,28 @@ class MapScanner extends TileBehavior
 	
 	//Placeholder for a new building
 	//Look to the other do<building name>() functions to guidance on what this function should do.
-	void doNewBuilding()
+	void doCaptain()
 	{
 		//Very basic building functionality. Checks for power and does "repair"
 		boolean powerOn = checkZonePower();
 		if ((city.cityTime % 8) == 0) {
-			repairZone(NEW_BUILDING, 3);
+			repairZone(CAPTAIN, 3);
 		}
+
+		int z;
+		if (powerOn) {
+			z = city.fireEffect;  //if powered, get effect
+		} else {
+			z = city.fireEffect/2; // from the funding ratio
+		}
+
+		traffic.mapX = xpos;
+		traffic.mapY = ypos;
+		if (!traffic.findPerimeterRoad()) {
+			z /= 2;
+		}
+
+		city.fireStMap[ypos/8][xpos/8] += z;
 	}
 
 	void doFireStation()
