@@ -12,6 +12,7 @@ import static micropolisj.engine.TileConstants.*;
 
 public class ToolStroke
 {
+	Micropolis engine;
 	final Micropolis city;
 	final MicropolisTool tool;
 	int xpos;
@@ -76,11 +77,11 @@ public class ToolStroke
 
 		case INDUSTRIAL:
 			return applyZone(eff, INDCLR);
-
+			
 		default:
 			// not expected
 			throw new Error("unexpected tool: "+tool);
-		}
+		}	
 	}
 
 	public void dragTo(int xdest, int ydest)
@@ -150,8 +151,17 @@ public class ToolStroke
 						canBuild = false;
 					}
 				}
+				
+//				if (tileValue == CAPTAIN) {
+//					if (engine.CaptainAvail) {				
+//					}
+//					else {
+//						canBuild = false;
+//					}
+//				}				
 			}
 		}
+
 		if (!canBuild) {
 			eff.toolResult(ToolResult.UH_OH);
 			return false;
