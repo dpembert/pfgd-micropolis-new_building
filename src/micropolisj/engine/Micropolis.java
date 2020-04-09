@@ -521,9 +521,23 @@ public class Micropolis
 		fcycle = (fcycle + 1) % 1024;
 		simulate(fcycle % 16);
 	}
-
+	
+	public boolean CaptainAvail = false;
+	void checkPlaneteers()
+	{
+		if (fireStationCount > 0) // && 
+			//stadiumCount > 0 &&
+			//policeCount > 0 &&
+			//airportCount > 0 &&
+			//seaportCount > 0) 
+			{
+				CaptainAvail = true;
+			}
+	}
+			
 	void clearCensus()
 	{
+		
 		poweredZoneCount = 0;
 		unpoweredZoneCount = 0;
 		firePop = 0;
@@ -568,6 +582,7 @@ public class Micropolis
 			if (scycle % 2 == 0) {
 				setValves();
 			}
+			
 			clearCensus();
 			break;
 
@@ -2652,11 +2667,21 @@ public class Micropolis
 				sendMessage(MicropolisMessage.FIRE_NEED_FUNDING);
 			}
 			break;
-	//	case 59:
-		//	if (fireEffect < 700 && totalPop > 20) {
-			//	sendMessage(MicropolisMessage.FIRE_NEED_FUNDING);
-		//	}
-			//break;
+		case 59:
+			if (fireStationCount == 0 || 
+				stadiumCount == 0 ||
+				policeCount == 0 ||
+				airportCount == 0 ||
+				seaportCount == 0) 
+			{
+				sendMessage(MicropolisMessage.NEED_PLANETEERS);
+				
+			}
+			
+			else {
+				
+			}
+			break;
 		case 60:
 			if (policeEffect < 700 && totalPop > 20) {
 				sendMessage(MicropolisMessage.POLICE_NEED_FUNDING);
