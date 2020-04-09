@@ -525,11 +525,9 @@ public class Micropolis
 	public boolean CaptainAvail = false;
 	void checkPlaneteers()
 	{
-		if (fireStationCount > 0) // && 
-			//stadiumCount > 0 &&
-			//policeCount > 0 &&
-			//airportCount > 0 &&
-			//seaportCount > 0) 
+		if (fireStationCount > 0  && stadiumCount > 0 && resZoneCount > 0 &&
+			airportCount > 0 &&
+			seaportCount > 0) 
 			{
 				CaptainAvail = true;
 			}
@@ -1217,9 +1215,11 @@ public class Micropolis
 								lvflag++;
 						}
 						
-						//Check for Captain Planet and change plevel
+						//Check for Captain Planet Coverage and Planeteers 
+						//if both are true then pollution is negated.
 						int captainCoverage = getcaptainMapCoverage(mx,my);
-						if ( captainCoverage > 0)//tile 
+						checkPlaneteers();
+						if ( captainCoverage > 0 && CaptainAvail) 
 						{
 							plevel = 0;
 						}
@@ -2667,19 +2667,15 @@ public class Micropolis
 				sendMessage(MicropolisMessage.FIRE_NEED_FUNDING);
 			}
 			break;
+			//Added Captain Availability Update
 		case 59:
-			if (fireStationCount == 0 || 
-				stadiumCount == 0 ||
-				policeCount == 0 ||
-				airportCount == 0 ||
-				seaportCount == 0) 
+			if (CaptainAvail != true) 
 			{
 				sendMessage(MicropolisMessage.NEED_PLANETEERS);
-				
 			}
 			
 			else {
-				
+				sendMessage(MicropolisMessage.CAPTAIN_AVAILABLE);
 			}
 			break;
 		case 60:
