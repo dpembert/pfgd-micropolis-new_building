@@ -86,6 +86,8 @@ public class Micropolis
 	public int [][] fireRate;       //firestations reach- used for overlay graphs
 	int [][] policeMap;      //police stations- cleared and rebuilt each sim cycle
 	public int [][] policeMapEffect;//police stations reach- used for overlay graphs
+	int [][] captainMap;      //captain planet - cleared and rebuilt each sim cycle
+	public int [][] captainMapCoverage;//captain planet reach- used for overlay graphs
 
 	/** For each 8x8 section of city, this is an integer between 0 and 64,
 	 * with higher numbers being closer to the center of the city. */
@@ -120,6 +122,7 @@ public class Micropolis
 	int churchCount;
 	int policeCount;
 	int fireStationCount;
+	int captainCount;
 	int stadiumCount;
 	int coalCount;
 	int nuclearCount;
@@ -177,6 +180,7 @@ public class Micropolis
 	int roadEffect = 32;
 	int policeEffect = 1000;
 	int fireEffect = 1000;
+	int captainEffect = 1000; //TODO: tune this number
 
 	int cashFlow; //net change in totalFunds in previous year
 
@@ -245,6 +249,8 @@ public class Micropolis
 		policeMap = new int[smY][smX];
 		policeMapEffect = new int[smY][smX];
 		fireRate = new int[smY][smX];
+		captainMap = new int[smY][smX];
+		captainMapCoverage = new int[smY][smX];
 		comRate = new int[smY][smX];
 
 		centerMassX = hX;
@@ -533,6 +539,7 @@ public class Micropolis
 		churchCount = 0;
 		policeCount = 0;
 		fireStationCount = 0;
+		captainCount = 0;
 		stadiumCount = 0;
 		coalCount = 0;
 		nuclearCount = 0;
@@ -544,6 +551,7 @@ public class Micropolis
 			for (int x = 0; x < fireStMap[y].length; x++) {
 				fireStMap[y][x] = 0;
 				policeMap[y][x] = 0;
+				captainMap[y][x] = 0;
 			}
 		}
 	}
@@ -648,6 +656,7 @@ public class Micropolis
 
 		case 15:
 			fireAnalysis();
+			captainAnalysis();
 			doDisasters();
 			break;
 
@@ -939,7 +948,21 @@ public class Micropolis
 		}
 		return nmap;
 	}
+	
+	void captainAnalysis()
+	{
+		captainMap = smoothFirePoliceMap(captainMap);
+		captainMap = smoothFirePoliceMap(captainMap);
+		captainMap = smoothFirePoliceMap(captainMap);
+		for (int sy = 0; sy < captainMap.length; sy++) {
+			for (int sx = 0; sx < captainMap[sy].length; sx++) {
+				captainMapCoverage[sy][sx] = captainMap[sy][sx];
+			}
+		}
 
+		fireMapOverlayDataChanged(MapState.CAPTAIN_OVERLAY);
+	}
+	
 	void fireAnalysis()
 	{
 		fireStMap = smoothFirePoliceMap(fireStMap);
@@ -1113,6 +1136,12 @@ public class Micropolis
 		return fireRate[ypos/8][xpos/8];
 	}
 
+	/** Accessor method for captainMapCoverage[]. */
+	public int getcaptainMapCoverage(int xpos, int ypos)
+	{
+		return captainMapCoverage[ypos/8][xpos/8];
+	}
+	
 	/** Accessor method for landValueMem overlay. */
 	public int getLandValue(int xpos, int ypos)
 	{
@@ -1171,6 +1200,13 @@ public class Micropolis
 							plevel += getPollutionValue(tile);
 							if (isConstructed(tile))
 								lvflag++;
+						}
+						
+						//Check for Captain Planet and change plevel
+						int captainCoverage = getcaptainMapCoverage(mx,my);
+						if ( captainCoverage > 0)//tile 
+						{
+							plevel = 0;
 						}
 					}
 				}
@@ -1730,6 +1766,7 @@ public class Micropolis
 		lastRailTotal = railTotal;
 		lastTotalPop = totalPop;
 		lastFireStationCount = fireStationCount;
+		//TODO: unsure if cap needs budget
 		lastPoliceCount = policeCount;
 
 		BudgetNumbers b = generateBudget();
@@ -2615,6 +2652,11 @@ public class Micropolis
 				sendMessage(MicropolisMessage.FIRE_NEED_FUNDING);
 			}
 			break;
+	//	case 59:
+		//	if (fireEffect < 700 && totalPop > 20) {
+			//	sendMessage(MicropolisMessage.FIRE_NEED_FUNDING);
+		//	}
+			//break;
 		case 60:
 			if (policeEffect < 700 && totalPop > 20) {
 				sendMessage(MicropolisMessage.POLICE_NEED_FUNDING);
